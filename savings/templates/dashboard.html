@@ -16,74 +16,155 @@
     </div>
   </div>
 
+  <!-- Net Balance - Most Important Metric (NEWLY ADDED) -->
+  <div class="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg mt-6 text-center text-green-800">
+      <p class="text-xs font-medium opacity-80">CURRENT NET BALANCE</p>
+      <!-- Conditional class for negative balance -->
+      <p class="text-3xl font-extrabold
+         {% if net_balance >= 0 %}text-green-600{% else %}text-red-500{% endif %}">
+          {{ net_balance|default:"0.00" }} UGX
+      </p>
+  </div>
+
+  <!-- Contributions and Expenses Summary -->
   <div class="mt-6 grid grid-cols-2 gap-4 text-center">
     <div class="bg-white/20 backdrop-blur-lg p-3 rounded-xl">
-      <p class="text-lg font-bold">{{ total_contributions }} UGX</p>
+      <p class="text-base font-bold">{{ total_contributions|default:"0.00" }} UGX</p>
       <p class="text-xs opacity-80">Total Contributions</p>
     </div>
     <div class="bg-white/20 backdrop-blur-lg p-3 rounded-xl">
-      <p class="text-lg font-bold">{{ total_expenses }} UGX</p>
+      <p class="text-base font-bold">{{ total_expenses|default:"0.00" }} UGX</p>
       <p class="text-xs opacity-80">Total Expenses</p>
     </div>
   </div>
 </div>
 
+<!-- Chart Section: Fund Growth Trend - FIX APPLIED HERE -->
+<div class="px-4 mb-4">
+    <div class="bg-white p-4 rounded-xl shadow-lg border border-gray-100">
+        <h2 class="text-base font-semibold text-gray-800 mb-3">
+            📈 Fund Growth (Last 6 Months)
+        </h2>
+        <!-- New wrapper div (w-full h-32) strictly controls the canvas size -->
+        <div class="w-full h-32">
+            <!-- Canvas now uses w-full h-full to fill its locked parent -->
+            <canvas id="balanceChart" class="w-full h-full"></canvas>
+        </div>
+    </div>
+</div>
+
 <!-- Section: Contributions -->
 <div class="space-y-4 px-4 mb-16">
   <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-    <h2 class="text-lg font-semibold text-gray-800 mb-3 flex justify-between">
+    <h2 class="text-base font-semibold text-gray-800 mb-3 flex justify-between">
       <span>🪙 Your Contributions</span>
-      <a href="{% url 'monthly_summary' %}" class="text-green-600 text-sm font-medium">View All</a>
+      <a href="{% url 'monthly_summary' %}" class="text-green-600 text-xs font-medium">View All</a>
     </h2>
-    {% if user_contributions %}
-      <ul class="divide-y">
-        {% for c in user_contributions %}
-          <li class="py-2 flex justify-between">
-            <span class="font-medium">{{ c.date|date:"M d, Y" }}</span>
-            <span class="text-green-700 font-semibold">{{ c.amount }} UGX</span>
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p class="text-gray-500 text-sm text-center py-2">No contributions yet.</p>
-    {% endif %}
+
+    <!-- Scrollable Container for Contributions -->
+    <div class="max-h-40 overflow-y-auto">
+      {% if user_contributions %}
+        <ul class="divide-y">
+          {% for c in user_contributions %}
+            <li class="py-1.5 flex justify-between">
+              <span class="text-sm font-medium">{{ c.date|date:"M d, Y" }}</span>
+              <span class="text-sm text-green-700 font-semibold">{{ c.amount }} UGX</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-gray-500 text-sm text-center py-2">No contributions yet.</p>
+      {% endif %}
+    </div>
   </div>
 
   <!-- Section: Recent Expenses -->
   <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-    <h2 class="text-lg font-semibold text-gray-800 mb-3 flex justify-between">
+    <h2 class="text-base font-semibold text-gray-800 mb-3 flex justify-between">
       <span>💸 Recent Expenses</span>
-      <a href="{% url 'monthly_summary' %}" class="text-green-600 text-sm font-medium">View All</a>
+      <a href="{% url 'monthly_summary' %}" class="text-green-600 text-xs font-medium">View All</a>
     </h2>
-    {% if expenses %}
-      <ul class="divide-y">
-        {% for e in expenses %}
-          <li class="py-2">
-            <div class="flex justify-between font-medium">
-              <span>{{ e.expense_type }}</span>
-              <span class="text-red-600">{{ e.amount }} UGX</span>
-            </div>
-            <p class="text-xs text-gray-500">{{ e.date|date:"M d, Y" }}</p>
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p class="text-gray-500 text-sm text-center py-2">No expenses recorded.</p>
-    {% endif %}
+
+    <!-- Scrollable Container for Expenses -->
+    <div class="max-h-40 overflow-y-auto">
+      {% if expenses %}
+        <ul class="divide-y">
+          {% for e in expenses %}
+            <li class="py-1.5">
+              <div class="flex justify-between font-medium">
+                <span class="text-sm">{{ e.category|title }}</span>
+                <span class="text-sm text-red-600">{{ e.amount }} UGX</span>
+              </div>
+              <p class="text-xs text-gray-500">{{ e.date|date:"M d, Y" }}</p>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-gray-500 text-sm text-center py-2">No expenses recorded.</p>
+      {% endif %}
+    </div>
   </div>
 </div>
 
-<!-- Floating Action Buttons for Admin -->
-{% if user.is_staff %}
-<div class="fixed bottom-6 right-6 flex flex-col gap-3">
-  <a href="{% url 'add_contribution' %}"
-     class="w-14 h-14 flex items-center justify-center rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700">
-    ➕
-  </a>
-  <a href="{% url 'add_expense' %}"
-     class="w-14 h-14 flex items-center justify-center rounded-full bg-red-600 text-white shadow-lg hover:bg-red-700">
-    💸
-  </a>
-</div>
-{% endif %}
+<!-- Chart.js setup for Fund Growth (Requires Chart.js library loaded in base.html) -->
+<script>
+
+  // Placeholder Data: Your Django view must calculate the monthly net balances
+  // and pass them to the template to replace these placeholders.
+  const chartLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+  const chartData = [50000, 85000, 70000, 120000, 150000, 190000];
+
+  if (document.getElementById('balanceChart')) {
+    const ctx = document.getElementById('balanceChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: chartLabels,
+        datasets: [{
+          label: 'Net Balance (UGX)',
+          data: chartData,
+          borderColor: '#10B981', // green-500
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointBackgroundColor: '#059669', // green-600
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+          }
+        },
+        scales: {
+          x: {
+            grid: {
+              display: false
+            }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+                // Formatting for larger numbers (e.g., K for thousands)
+                callback: function(value, index, values) {
+                    if (value >= 1000) {
+                        return value / 1000 + 'K';
+                    }
+                    return value;
+                }
+            }
+          }
+        }
+      }
+    });
+  }
+</script>
+<!-- Floating Action Buttons for Admin (Replaced by Bottom Nav in base.html) -->
 {% endblock %}
