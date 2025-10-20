@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="min-h-screen bg-gradient-to-br from-green-600 via-emerald-500 to-lime-500 text-white p-4">
+  <!-- Header -->
+  <div class="max-w-3xl mx-auto text-center mb-8">
+    <h1 class="text-2xl md:text-3xl font-bold mb-2">Monthly Summary</h1>
+    <p class="text-sm opacity-90">Overview of contributions and expenses for {{ month|date:"F Y" }}</p>
+  </div>
+
+  <!-- Totals Overview -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto mb-6">
+    <div class="bg-white/10 backdrop-blur-lg p-5 rounded-2xl shadow-lg text-center">
+      <h2 class="text-lg font-semibold mb-1">Total Contributions</h2>
+      <p class="text-2xl font-bold text-green-300">{{ total_contributions }} UGX</p>
+    </div>
+    <div class="bg-white/10 backdrop-blur-lg p-5 rounded-2xl shadow-lg text-center">
+      <h2 class="text-lg font-semibold mb-1">Total Expenses</h2>
+      <p class="text-2xl font-bold text-red-300">{{ total_expenses }} UGX</p>
+    </div>
+  </div>
+
+  <!-- Contributions -->
+  <div class="max-w-3xl mx-auto mb-8">
+    <h2 class="text-xl font-bold mb-3 text-white/90">Contributions</h2>
+    <div class="space-y-3">
+      {% for contribution in user_contributions %}
+      <div class="bg-white/10 backdrop-blur-lg p-4 rounded-xl shadow-md flex justify-between items-center">
+        <div>
+          <p class="font-semibold text-white">{{ contribution.member.name }}</p>
+          <p class="text-xs text-white/80">{{ contribution.date|date:"M d, Y" }}</p>
+        </div>
+        <span class="text-green-300 font-bold">{{ contribution.amount }} UGX</span>
+      </div>
+      {% empty %}
+      <div class="text-center text-white/80 italic">No contributions this month.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Expenses -->
+  <div class="max-w-3xl mx-auto mb-8">
+    <h2 class="text-xl font-bold mb-3 text-white/90">Expenses</h2>
+    <div class="space-y-3">
+      {% for expense in expenses %}
+      <div class="bg-white/10 backdrop-blur-lg p-4 rounded-xl shadow-md flex justify-between items-center">
+        <div>
+          <p class="font-semibold text-white">{{ expense.reason }}</p>
+          <p class="text-xs text-white/80">{{ expense.date|date:"M d, Y" }}</p>
+        </div>
+        <span class="text-red-300 font-bold">{{ expense.amount }} UGX</span>
+      </div>
+      {% empty %}
+      <div class="text-center text-white/80 italic">No expenses this month.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Net Balance -->
+  <div class="max-w-3xl mx-auto text-center mt-8 mb-6">
+    <div class="bg-white/10 backdrop-blur-lg p-5 rounded-2xl shadow-lg">
+      <h2 class="text-lg font-semibold mb-1">Net Balance</h2>
+      <p class="text-2xl font-bold {% if balance >= 0 %}text-green-300{% else %}text-red-300{% endif %}">
+        {{ balance }} UGX
+      </p>
+    </div>
+  </div>
+
+{% if user.is_staff %}
+<div class="fixed bottom-6 right-6 flex flex-col gap-3">
+  <a href="{% url 'add_contribution' %}"
+     class="w-14 h-14 flex items-center justify-center rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700">
+    ➕
+  </a>
+  <a href="{% url 'add_expense' %}"
+     class="w-14 h-14 flex items-center justify-center rounded-full bg-red-600 text-white shadow-lg hover:bg-red-700">
+    💸
+  </a>
+</div>
+{% endif %}
+</section>
+{% endblock %}

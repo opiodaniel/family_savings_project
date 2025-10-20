@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Family Youth Savings{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Modal Styling for smooth transitions and mobile bottom-sheet effect */
+    .modal-overlay {
+      background-color: rgba(0, 0, 0, 0.7);
+      transition: opacity 0.3s ease;
+      visibility: hidden;
+      opacity: 0;
+    }
+    .modal-overlay.open {
+      visibility: visible;
+      opacity: 1;
+    }
+    .modal-content {
+      /* Start position: off-screen bottom for mobile */
+      transform: translateY(100%);
+      transition: transform 0.3s ease-out;
+      max-width: 40rem;
+    }
+    .modal-overlay.open .modal-content {
+      transform: translateY(0);
+    }
+    /* Desktop/Tablet: Center the modal */
+    @media (min-width: 640px) {
+      .modal-content {
+        transform: translateY(0); /* Reset mobile slide-up */
+        max-width: 40rem; /* Limit width */
+      }
+      .modal-overlay.open .modal-content {
+        /* On open, center it vertically with a slight upward transformation for effect */
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Top Nav -->
+  <nav class="bg-white border-b shadow-sm fixed top-0 left-0 w-full z-50">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="{% url 'dashboard' %}" class="text-xl font-extrabold text-green-700 tracking-tight">
+        💰 FYS
+      </a>
+      <div>
+        {% if user.is_authenticated %}
+          <a href="{% url 'logout' %}" class="text-sm text-red-600 font-medium p-2 rounded-full hover:bg-red-50">Logout</a>
+        {% else %}
+          <a href="{% url 'login' %}" class="text-sm text-green-700 font-medium p-2 rounded-full hover:bg-green-50">Login</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <!-- Note: pb-28 added here to prevent content from hiding behind the fixed bottom nav -->
+  <main class="pt-16 pb-28 max-w-3xl mx-auto">
+    {% if messages %}
+    <div class="px-4 mb-4">
+      {% for message in messages %}
+      <div class="p-3 mb-2 rounded-xl font-medium text-center shadow-md
+        {% if message.tags == 'success' %} bg-green-500 text-white
+        {% elif message.tags == 'error' %} bg-red-500 text-white
+        {% else %} bg-blue-500 text-white {% endif %}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Bottom Nav (Authenticated Users) - Modern Mobile UX -->
+  {% if user.is_authenticated %}
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-green-500/50 shadow-2xl z-50">
+    <div class="max-w-3xl mx-auto flex justify-around items-center h-20">
+
+      <!-- 1. Dashboard Link -->
+      <a href="{% url 'dashboard' %}" class="flex flex-col items-center text-gray-500 hover:text-green-700 transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-10v10a1 1 0 001 1h3M13 10l-2 2-2-2"></path></svg>
+        <span class="text-xs mt-1 font-medium">Home</span>
+      </a>
+
+      <!-- 2. Register Member Link (Staff Only) -->
+      {% if user.is_staff %}
+      <a id="openMemberModalBtn" href="#" class="flex flex-col items-center text-gray-500 hover:text-green-700 transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-4l4 4m-4-4l-4 4m6-4a6 6 0 11-12 0 6 6 0 0112 0z"></path></svg>
+        <span class="text-xs mt-1 font-medium">Members</span>
+      </a>
+      {% endif %}
+
+      <!-- 3. Add Contribution (Primary Action) - CENTERED FAB (Staff/Admin Only for this action) -->
+      {% if user.is_staff %}
+      <a href="{% url 'add_contribution' %}" class="transform -translate-y-4 w-16 h-16 bg-green-600 text-white rounded-full flex items-center justify-center shadow-xl ring-4 ring-white hover:bg-green-700 transition-all duration-300">
+        <span class="text-3xl font-light">+</span>
+      </a>
+      {% else %}
+      <!-- Placeholder if not staff, keeps layout centered -->
+      <div class="w-16 h-16"></div>
+      {% endif %}
+
+      <!-- 4. Add Expense Link (Staff Only) -->
+      {% if user.is_staff %}
+      <a href="{% url 'add_expense' %}" class="flex flex-col items-center text-gray-500 hover:text-red-700 transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2l-2 4h14l-2-4h2a2 2 0 002-2V9a2 2 0 00-2-2h-3"></path></svg>
+        <span class="text-xs mt-1 font-medium">Expense</span>
+      </a>
+      {% endif %}
+
+      <!-- 5. Profile Link (FOR ALL AUTHENTICATED USERS) -->
+      <a href="{% url 'profile' %}" class="flex flex-col items-center text-gray-500 hover:text-green-700 transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+        <span class="text-xs mt-1 font-medium">Profile</span>
+      </a>
+
+    </div>
+  </nav>
+  {% endif %}
+
+  <!-- Member Registration Modal Structure (Hidden by default) -->
+  <div id="memberRegistrationModal" class="modal-overlay fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="modal-content w-full sm:max-w-xl max-h-full overflow-y-auto bg-gray-100 sm:rounded-xl shadow-2xl relative">
+        <!-- INCLUDE: The actual form content is loaded here -->
+        {% include 'member_registration_modal_content.html' %}
+    </div>
+  </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('memberRegistrationModal');
+        const openBtn = document.getElementById('openMemberModalBtn');
+
+        const closeModal = () => {
+            modal.classList.remove('open');
+            document.body.style.overflow = ''; // Restore background scrolling
+        };
+
+        // Open Modal
+        if (openBtn) {
+            openBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                modal.classList.add('open');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            });
+        }
+
+        // Close Modal by clicking outside (overlay)
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close Modal using the dedicated button (delegation for robustness)
+        modal.addEventListener('click', (e) => {
+            if (e.target.closest('#closeMemberModalBtn')) {
+                closeModal();
+            }
+        });
+    });
+</script>
+</body>
+</html>

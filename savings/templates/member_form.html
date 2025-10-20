@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow">
+  <h2 class="font-semibold mb-4 text-lg">Add {{ title|default:"Item" }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+      Save
+    </button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+<div class="p-6 bg-white sm:rounded-xl">
+
+    <!-- Header with Close Button -->
+    <div class="flex justify-between items-start mb-6 border-b pb-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-green-700">New Member Registration</h1>
+            <p class="text-sm text-gray-500 mt-1">Fill in the details below to onboard a new family member.</p>
+        </div>
+        <!-- Close Button (Targeted by JS in base.html) -->
+        <button id="closeMemberModalBtn" type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none p-2 rounded-full transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+    </div>
+
+    <!-- Registration Form -->
+    <!-- NOTE: The action URL must be correct for Django to process the form -->
+    <form method="POST" action="{% url 'register_member_view' %}" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Input Group: Name Fields (Side by Side) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label for="modal_first_name" class="block text-sm font-medium text-gray-700">First Name</label>
+                <input type="text" id="modal_first_name" name="first_name" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+            </div>
+            <div>
+                <label for="modal_last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
+                <input type="text" id="modal_last_name" name="last_name" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+            </div>
+        </div>
+
+        <!-- Input Group: Username -->
+        <div>
+            <label for="modal_username" class="block text-sm font-medium text-gray-700">Username (Login ID)</label>
+            <input type="text" id="modal_username" name="username" required
+                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+        </div>
+
+        <!-- Input Group: Location -->
+        <div>
+            <label for="modal_current_location" class="block text-sm font-medium text-gray-700">Current Location</label>
+            <input type="text" id="modal_current_location" name="current_location" required
+                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+        </div>
+
+        <!-- Input Group: Phone Numbers (Side by Side) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label for="modal_phone_num_1" class="block text-sm font-medium text-gray-700">Primary Phone (PhoneNum1)</label>
+                <input type="text" id="modal_phone_num_1" name="phone_num_1" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+            </div>
+            <div>
+                <label for="modal_phone_num_2" class="block text-sm font-medium text-gray-700">Secondary Phone (PhoneNum2)</label>
+                <input type="text" id="modal_phone_num_2" name="phone_num_2"
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+            </div>
+        </div>
+
+        <!-- Input Group: Password and Confirm Password (side-by-side on desktop, stacked on mobile) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label for="modal_password" class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" id="modal_password" name="password" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+            </div>
+            <div>
+                <label for="modal_password2" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                <input type="password" id="modal_password2" name="password2" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit"
+                class="w-full py-3 px-4 border border-transparent rounded-xl shadow-lg text-lg font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out mt-8">
+            Register Member
+        </button>
+    </form>
+</div>

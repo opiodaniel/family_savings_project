@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="relative bg-gradient-to-br from-green-600 to-green-800 text-white p-6 rounded-b-3xl shadow-lg mb-8">
+  <div class="flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold">Welcome, {{ user.username|title }}</h1>
+      <p class="text-sm opacity-80">Family Youth Savings</p>
+    </div>
+    <div>
+      <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=fff&color=34d399"
+           alt="avatar"
+           class="w-12 h-12 rounded-full border-2 border-white shadow">
+    </div>
+  </div>
+
+  <div class="mt-6 grid grid-cols-2 gap-4 text-center">
+    <div class="bg-white/20 backdrop-blur-lg p-3 rounded-xl">
+      <p class="text-lg font-bold">{{ total_contributions }} UGX</p>
+      <p class="text-xs opacity-80">Total Contributions</p>
+    </div>
+    <div class="bg-white/20 backdrop-blur-lg p-3 rounded-xl">
+      <p class="text-lg font-bold">{{ total_expenses }} UGX</p>
+      <p class="text-xs opacity-80">Total Expenses</p>
+    </div>
+  </div>
+</div>
+
+<!-- Section: Contributions -->
+<div class="space-y-4 px-4 mb-16">
+  <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+    <h2 class="text-lg font-semibold text-gray-800 mb-3 flex justify-between">
+      <span>🪙 Your Contributions</span>
+      <a href="{% url 'monthly_summary' %}" class="text-green-600 text-sm font-medium">View All</a>
+    </h2>
+    {% if user_contributions %}
+      <ul class="divide-y">
+        {% for c in user_contributions %}
+          <li class="py-2 flex justify-between">
+            <span class="font-medium">{{ c.date|date:"M d, Y" }}</span>
+            <span class="text-green-700 font-semibold">{{ c.amount }} UGX</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-gray-500 text-sm text-center py-2">No contributions yet.</p>
+    {% endif %}
+  </div>
+
+  <!-- Section: Recent Expenses -->
+  <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+    <h2 class="text-lg font-semibold text-gray-800 mb-3 flex justify-between">
+      <span>💸 Recent Expenses</span>
+      <a href="{% url 'monthly_summary' %}" class="text-green-600 text-sm font-medium">View All</a>
+    </h2>
+    {% if expenses %}
+      <ul class="divide-y">
+        {% for e in expenses %}
+          <li class="py-2">
+            <div class="flex justify-between font-medium">
+              <span>{{ e.expense_type }}</span>
+              <span class="text-red-600">{{ e.amount }} UGX</span>
+            </div>
+            <p class="text-xs text-gray-500">{{ e.date|date:"M d, Y" }}</p>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-gray-500 text-sm text-center py-2">No expenses recorded.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Floating Action Buttons for Admin -->
+{% if user.is_staff %}
+<div class="fixed bottom-6 right-6 flex flex-col gap-3">
+  <a href="{% url 'add_contribution' %}"
+     class="w-14 h-14 flex items-center justify-center rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700">
+    ➕
+  </a>
+  <a href="{% url 'add_expense' %}"
+     class="w-14 h-14 flex items-center justify-center rounded-full bg-red-600 text-white shadow-lg hover:bg-red-700">
+    💸
+  </a>
+</div>
+{% endif %}
+{% endblock %}
