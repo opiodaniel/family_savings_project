@@ -1,83 +1,133 @@
 {% extends 'base.html' %}
-{% load static %}
+{% block title %}Monthly Summary{% endblock %}
 
 {% block content %}
-<section class="min-h-screen bg-gradient-to-br from-green-600 via-emerald-500 to-lime-500 text-white p-4">
-  <!-- Header -->
-  <div class="max-w-3xl mx-auto text-center mb-8">
-    <h1 class="text-2xl md:text-3xl font-bold mb-2">Monthly Summary</h1>
-    <p class="text-sm opacity-90">Overview of contributions and expenses for {{ month|date:"F Y" }}</p>
-  </div>
-
-  <!-- Totals Overview -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto mb-6">
-    <div class="bg-white/10 backdrop-blur-lg p-5 rounded-2xl shadow-lg text-center">
-      <h2 class="text-lg font-semibold mb-1">Total Contributions</h2>
-      <p class="text-2xl font-bold text-green-300">{{ total_contributions }} UGX</p>
+<!-- Header -->
+<div class="relative bg-gradient-to-br from-green-600 to-green-800 to-green-800 text-white p-6 rounded-b-3xl shadow-lg mb-8">
+    <a href="{% url 'dashboard' %}" class="absolute top-4 left-4 text-white opacity-80 hover:opacity-100">
+        <!-- Back Icon -->
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+    </a>
+    <div class="text-center pt-2">
+        <p class="text-sm font-medium opacity-80">Monthly Report</p>
+        <h1 class="text-3xl font-bold">{{ month }} {{ year }}</h1>
     </div>
-    <div class="bg-white/10 backdrop-blur-lg p-5 rounded-2xl shadow-lg text-center">
-      <h2 class="text-lg font-semibold mb-1">Total Expenses</h2>
-      <p class="text-2xl font-bold text-red-300">{{ total_expenses }} UGX</p>
-    </div>
-  </div>
 
-  <!-- Contributions -->
-  <div class="max-w-3xl mx-auto mb-8">
-    <h2 class="text-xl font-bold mb-3 text-white/90">Contributions</h2>
-    <div class="space-y-3">
-      {% for contribution in user_contributions %}
-      <div class="bg-white/10 backdrop-blur-lg p-4 rounded-xl shadow-md flex justify-between items-center">
-        <div>
-          <p class="font-semibold text-white">{{ contribution.member.name }}</p>
-          <p class="text-xs text-white/80">{{ contribution.date|date:"M d, Y" }}</p>
+    <!-- Summary Metrics -->
+    <div class="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg mt-6 text-center text-green-800">
+        <p class="text-sm font-medium opacity-80">NET BALANCE</p>
+        <p class="text-3xl font-extrabold
+           {% if balance >= 0 %}text-green-600{% else %}text-red-500{% endif %}">
+            {{ balance|default:"0.00" }} UGX
+        </p>
+    </div>
+
+    <div class="mt-4 grid grid-cols-2 gap-3 text-center">
+        <div class="bg-white/20 backdrop-blur-lg p-3 rounded-xl">
+            <p class="text-base font-bold">{{ total_contributions|default:"0.00" }} UGX</p>
+            <p class="text-xs opacity-80">Total In</p>
         </div>
-        <span class="text-green-300 font-bold">{{ contribution.amount }} UGX</span>
-      </div>
-      {% empty %}
-      <div class="text-center text-white/80 italic">No contributions this month.</div>
-      {% endfor %}
-    </div>
-  </div>
-
-  <!-- Expenses -->
-  <div class="max-w-3xl mx-auto mb-8">
-    <h2 class="text-xl font-bold mb-3 text-white/90">Expenses</h2>
-    <div class="space-y-3">
-      {% for expense in expenses %}
-      <div class="bg-white/10 backdrop-blur-lg p-4 rounded-xl shadow-md flex justify-between items-center">
-        <div>
-          <p class="font-semibold text-white">{{ expense.reason }}</p>
-          <p class="text-xs text-white/80">{{ expense.date|date:"M d, Y" }}</p>
+        <div class="bg-white/20 backdrop-blur-lg p-3 rounded-xl">
+            <p class="text-base font-bold">{{ total_expenses|default:"0.00" }} UGX</p>
+            <p class="text-xs opacity-80">Total Out</p>
         </div>
-        <span class="text-red-300 font-bold">{{ expense.amount }} UGX</span>
-      </div>
-      {% empty %}
-      <div class="text-center text-white/80 italic">No expenses this month.</div>
-      {% endfor %}
     </div>
-  </div>
-
-  <!-- Net Balance -->
-  <div class="max-w-3xl mx-auto text-center mt-8 mb-6">
-    <div class="bg-white/10 backdrop-blur-lg p-5 rounded-2xl shadow-lg">
-      <h2 class="text-lg font-semibold mb-1">Net Balance</h2>
-      <p class="text-2xl font-bold {% if balance >= 0 %}text-green-300{% else %}text-red-300{% endif %}">
-        {{ balance }} UGX
-      </p>
-    </div>
-  </div>
-
-{% if user.is_staff %}
-<div class="fixed bottom-6 right-6 flex flex-col gap-3">
-  <a href="{% url 'add_contribution' %}"
-     class="w-14 h-14 flex items-center justify-center rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700">
-    ➕
-  </a>
-  <a href="{% url 'add_expense' %}"
-     class="w-14 h-14 flex items-center justify-center rounded-full bg-red-600 text-white shadow-lg hover:bg-red-700">
-    💸
-  </a>
 </div>
-{% endif %}
-</section>
+
+<!-- Section: All Contributions -->
+<div class="space-y-4 px-4 mb-16">
+    <div class="bg-white p-4 rounded-xl shadow-lg border border-gray-100">
+        <h2 class="text-lg font-semibold text-gray-800 mb-3 flex justify-between">
+            <span>🪙 All Contributions ({{ user_contributions|length }})</span>
+        </h2>
+
+        <!-- Table Container - Height reduced to max-h-60 for compactness -->
+        <div class="overflow-x-auto">
+            <div class="max-h-60 overflow-y-auto">
+                {% if user_contributions %}
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky top-0">
+                            <tr>
+                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Contributor
+                                </th>
+                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Date
+                                </th>
+                                <th scope="col" class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Amount
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for c in user_contributions %}
+                            <tr>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <!-- Display the Member's name from the related Member object -->
+                                    {{ c.member.first_name|title }} {{ c.member.last_name|title }}
+                                </td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">
+                                    {{ c.date|date:"d M" }}
+                                </td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-right font-semibold text-green-600">
+                                    {{ c.amount }} UGX
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-gray-500 text-sm text-center py-4">No contributions recorded this month.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Section: All Expenses -->
+    <div class="bg-white p-4 rounded-xl shadow-lg border border-gray-100">
+        <h2 class="text-lg font-semibold text-gray-800 mb-3 flex justify-between">
+            <span>💸 All Expenses ({{ expenses|length }})</span>
+        </h2>
+
+        <!-- Expense List - Using the same max height for consistency -->
+        <div class="overflow-x-auto">
+            <div class="max-h-60 overflow-y-auto">
+                {% if expenses %}
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky top-0">
+                            <tr>
+                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Category
+                                </th>
+                                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Date
+                                </th>
+                                <th scope="col" class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Amount
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for e in expenses %}
+                            <tr>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ e.category|title }}
+                                </td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">
+                                    {{ e.date|date:"d M" }}
+                                </td>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-right font-semibold text-red-600">
+                                    {{ e.amount }} UGX
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-gray-500 text-sm text-center py-4">No expenses recorded this month.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

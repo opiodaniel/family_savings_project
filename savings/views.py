@@ -99,12 +99,16 @@ def dashboard(request):
     today = timezone.now()
     month = today.month
     year = today.year
+    lifetime_total_contributions = Contribution.objects.aggregate(
+        total=Sum('amount')
+    )['total'] or 0
     total_contributions = Contribution.objects.filter(month=month, year=year).aggregate(total=Sum('amount'))['total'] or 0
     total_expenses = Expense.objects.filter(date__month=month, date__year=year).aggregate(total=Sum('amount'))['total'] or 0
     user_contributions = Contribution.objects.filter(month=month, year=year).select_related('member')
     expenses = Expense.objects.filter(date__month=month, date__year=year)
     net_balance = total_contributions - total_expenses
     return render(request, 'dashboard.html', {
+        'lifetime_total_contributions': lifetime_total_contributions,
         'total_contributions': total_contributions,
         'total_expenses': total_expenses,
         'user_contributions': user_contributions,
