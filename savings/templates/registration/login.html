@@ -1,37 +1,60 @@
 {% extends 'base.html' %}
-{% load form_tags %}
 
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<section class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-600 via-emerald-500 to-lime-500 p-4">
-  <div class="bg-white rounded-3xl shadow-xl w-full max-w-md p-8">
-    <h1 class="text-2xl font-bold text-gray-800 text-center mb-6">💚 Family Savings Login</h1>
+<section class="h-screen grid place-items-center bg-gray-900 bg-gradient-to-br from-gray-900 to-emerald-900 p-4 overflow-hidden">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 ring-4 ring-emerald-500/10 transition duration-500 hover:shadow-emerald-500/30">
+
+    <div class="text-center mb-8">
+        <div class="text-4xl text-emerald-500 mb-2">💎</div>
+        <h1 class="text-3xl font-extrabold text-gray-800">
+            Secure Login
+        </h1>
+        <p class="text-sm text-gray-500 mt-1">Family Youth Savings Access</p>
+    </div>
 
     <form method="post" class="space-y-5">
       {% csrf_token %}
-      {{ form.non_field_errors }}
+      {% if form.non_field_errors %}
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative text-sm" role="alert">
+              {{ form.non_field_errors }}
+          </div>
+      {% endif %}
 
+      <!-- Username Field -->
       <div>
-        <label class="block text-gray-700 font-medium mb-1">Username</label>
-        {{ form.username|add_class:"w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" }}
+        <label class="block text-sm font-semibold text-gray-700 mb-1" for="{{ form.username.id_for_label }}">Username</label>
+        <input type="text"
+               name="{{ form.username.name }}"
+               id="{{ form.username.id_for_label }}"
+               class="w-full border-2 border-gray-300 rounded-xl px-4 py-2 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500 focus:ring-1 focus:outline-none transition duration-150 shadow-sm"
+               value="{{ form.username.value|default:'' }}"
+               placeholder="Your unique username"
+               required>
         {{ form.username.errors }}
       </div>
 
+      <!-- Password Field -->
       <div>
-        <label class="block text-gray-700 font-medium mb-1">Password</label>
-        {{ form.password|add_class:"w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" }}
+        <label class="block text-sm font-semibold text-gray-700 mb-1" for="{{ form.password.id_for_label }}">Password</label>
+        <input type="password"
+               name="{{ form.password.name }}"
+               id="{{ form.password.id_for_label }}"
+               class="w-full border-2 border-gray-300 rounded-xl px-4 py-2 bg-gray-50 focus:border-emerald-500 focus:ring-emerald-500 focus:ring-1 focus:outline-none transition duration-150 shadow-sm"
+               placeholder="••••••••"
+               required>
         {{ form.password.errors }}
       </div>
 
-      <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg font-semibold shadow-md transition duration-200">
-        Login
+      <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold shadow-lg transition duration-200 transform hover:shadow-xl hover:scale-[1.01] tracking-wider">
+        ACCESS FUND
       </button>
     </form>
 
-    <p class="text-sm text-gray-500 text-center mt-4">
-      Don’t have an account?
-      <a href="{% url 'register' %}" class="text-green-600 font-medium hover:underline">Register</a>
+    <p class="text-xs text-gray-500 text-center mt-6">
+      Admin access only. New family members need to be
+      <a href="#" class="text-emerald-600 font-bold hover:underline">registered</a>.
     </p>
   </div>
 </section>
