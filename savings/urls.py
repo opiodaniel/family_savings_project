@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('members/add/', views.add_member, name='add_member'),
+    path('members/', views.member_management_view, name='member_management'),
+    path('members/<int:member_id>/', views.member_detail_view, name='member_detail'),
     path('contributions/add/', views.add_contribution, name='add_contribution'),
     path('expenses/add/', views.add_expense, name='add_expense'),
     path('monthly-summary/', views.monthly_summary, name='monthly_summary'),

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Manage Members{% endblock %}
+
+{% block content %}
+<div class="space-y-6 px-4">
+    <!-- Header and Search -->
+    <div class="pt-2">
+        <h1 class="text-xl font-bold text-gray-800">Family Members ({{ members|length }})</h1>
+        <p class="text-sm text-gray-500">View and manage all registered members.</p>
+    </div>
+
+    <!-- Search Bar and Action Button -->
+    <div class="flex items-center gap-2">
+        <input type="text" 
+               placeholder="Search by name or phone..." 
+               class="flex-1 border-2 border-gray-200 rounded-xl px-4 py-2 text-sm focus:border-emerald-500 focus:outline-none transition duration-150 shadow-sm"
+               id="memberSearchInput">
+        
+        <!-- Link to open the registration modal (using the ID defined in base.html) -->
+        <button onclick="document.getElementById('registration-modal').classList.remove('hidden')" 
+                class="bg-emerald-600 text-white rounded-xl p-2 shadow-md hover:bg-emerald-700 transition duration-200"
+                title="Register New Member">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-4l4 4m-4-4l-4 4m6-4a6 6 0 11-12 0 6 6 0 0112 0z"></path></svg>
+        </button>
+    </div>
+
+    <!-- Member List Container -->
+    <div class="bg-white rounded-xl shadow-lg border border-gray-100 divide-y overflow-hidden">
+        <!-- Scrollable list -->
+        <div class="max-h-[60vh] overflow-y-auto" id="memberList">
+            {% if members %}
+                {% for member in members %}
+                    <a href="{% url 'member_detail' member.id %}" class="block hover:bg-gray-50 transition duration-100">
+                        <div class="flex justify-between items-center p-4">
+                            <!-- Name and Location -->
+                            <div>
+                                <p class="font-semibold text-gray-800">{{ member.first_name }} {{ member.last_name }}</p>
+                                <p class="text-xs text-gray-500 mt-0.5">@{{ member.user.username }} | {{ member.current_location }}</p>
+                            </div>
+                            <!-- Contact Info and Status -->
+                            <div class="text-right">
+                                <p class="text-sm text-emerald-600 font-medium">{{ member.phone_num_1 }}</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Last Active: Today</p>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <p class="text-center text-gray-500 py-6 text-sm">No family members registered yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Simple client-side search functionality
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('memberSearchInput');
+        const memberList = document.getElementById('memberList');
+        const memberItems = memberList.getElementsByTagName('a');
+
+        searchInput.addEventListener('keyup', (e) => {
+            const searchText = e.target.value.toLowerCase();
+            for (let i = 0; i < memberItems.length; i++) {
+                const item = memberItems[i];
+                // Get text content of the item (Name, Username, Phone)
+                const textContent = item.textContent || item.innerText;
+                
+                if (textContent.toLowerCase().indexOf(searchText) > -1) {
+                    item.style.display = ""; // Show
+                } else {
+                    item.style.display = "none"; // Hide
+                }
+            }
+        });
+    });
+</script>
+
+{% endblock %}

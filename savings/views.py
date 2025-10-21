@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.db.models import Sum
 from django.views.generic import TemplateView
@@ -214,3 +214,32 @@ def profile_view(request):
         'member': member,  # This is the object passed to the profile.html template
     }
     return render(request, 'my_profile.html', context)
+
+
+
+@user_passes_test(is_staff_user)
+def member_management_view(request):
+    """Displays a list of all registered family members."""
+    members = Member.objects.select_related('user').all().order_by('first_name')
+    context = {
+        'members': members,
+    }
+    return render(request, 'member_management.html', context)
+
+
+@user_passes_test(is_staff_user)
+def member_detail_view(request, member_id):
+    """Displays the profile and financial history for a specific member."""
+    # Fetch the member object, raising a 404 if not found
+    member = get_object_or_404(Member.objects.select_related('user'), id=member_id)
+
+    # Fetch transactions related to this member
+    contributions = member.contributions.all().order_by('-date')
+    expenses = member.member_expenses.all().order_by('-date') # Assuming a related name 'member_expenses' is needed if member can be linked to an Expense
+
+    context = {
+        'member': member,
+        'contributions': contributions,
+        'expenses': expenses,
+    }
+    return render(request, 'member_detail.html', context)
