@@ -69,30 +69,5 @@
             {% endif %}
         </div>
     </div>
-
-    <!-- Section 3: Expenses Linked to Member (if any) -->
-    <div class="bg-white p-4 rounded-xl shadow-md border border-gray-100">
-        <h2 class="text-base font-semibold text-gray-800 mb-3 flex items-center">
-            <span class="mr-2 text-red-600">💸</span>
-            Linked Expenses
-        </h2>
-        <div class="max-h-60 overflow-y-auto">
-            {% if expenses %}
-                <ul class="divide-y text-sm">
-                    {% for e in expenses %}
-                        <li class="py-2 flex justify-between">
-                            <div class="flex flex-col">
-                                <span class="font-medium">{{ e.category|title }} Support</span>
-                                <span class="text-xs text-gray-500">{{ e.date|date:"M d, Y" }} - {{ e.description|truncatechars:30 }}</span>
-                            </div>
-                            <span class="text-red-700 font-semibold">{{ e.amount }} UGX</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="text-gray-500 text-sm text-center py-4">No fund expenses are linked to this member.</p>
-            {% endif %}
-        </div>
-    </div>
 </div>
 {% endblock %}

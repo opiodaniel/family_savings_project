@@ -235,11 +235,9 @@ def member_detail_view(request, member_id):
 
     # Fetch transactions related to this member
     contributions = member.contributions.all().order_by('-date')
-    # expenses = member.member_expenses.all().order_by('-date') # Assuming a related name 'member_expenses' is needed if member can be linked to an Expense
 
     context = {
         'member': member,
         'contributions': contributions,
-        # 'expenses': expenses,
     }
     return render(request, 'member_detail.html', context)
